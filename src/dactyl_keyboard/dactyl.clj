@@ -42,9 +42,9 @@
           (= column 1) [0 -3 0]         ; Pointer finger EXTRA keys
           (= column 2) [0 -0.8 0]       ; Pointer finger
           (= column 3) [0 2.82 -2.82]   ; Middle finger, 
-          (= column 4) [0 0 0]          ; Ring finger
+          (= column 4) [0 -0.2 0]       ; Ring finger
           (= column 5) [0 -6 0.8]       ; Pinky
-          (>= column 6) [0 -12 5.64]    ; Modifiers
+          (>= column 6) [0 -15.2 5.64]  ; Modifiers
           :else [0 0 0])
     ;; Section to modify if inner columb is disabled
     (cond (= column 0) [0 -3 0]         ; Pointer finger EXTRA keys
@@ -52,7 +52,7 @@
           (= column 2) [0 2.82 -2.82]   ; Middle finger, 
           (= column 3) [0 0 0]          ; Ring finger
           (= column 4) [0 -6 0.8]       ; Pinky
-          (>= column 5) [0 -12 5.64]    ; Modifiers
+          (>= column 5) [0 -15.2 5.64]  ; Modifiers
           :else [0 0 0])))
 
 
