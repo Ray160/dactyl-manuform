@@ -16,10 +16,10 @@
 (def nrows 5)
 (def ncols 7)
 
-(def α (/ π 12))                        ; curvature of the columns
+(def α (/ π 10))                        ; curvature of the columns
 (def β (/ π 36))                        ; curvature of the rows
 (def centerrow (- nrows 3))             ; controls front-back tilt
-(def centercol 4)                       ; controls left-right tilt / tenting (higher number is more tenting)
+(def centercol 3)                       ; controls left-right tilt / tenting (higher number is more tenting)
 (def tenting-angle (/ π 12))            ; or, change this for more precise tenting control
 
 (def pinky-15u true)                   ; controls whether the outer column uses 1.5u keys
@@ -34,19 +34,21 @@
 
 (defn column-offset [column]
   (if inner-column
-    (cond (<= column 1) [0 -2 0]
-          (= column 3) [0 2.82 -4.5]
-          (>= column 5) [0 -12 5.64]    ; original [0 -5.8 5.64]
-          :else [0 0 0])
-    (cond (= column 2) [0 2.82 -4.5]
-          (>= column 4) [0 -12 5.64]    ; original [0 -5.8 5.64]
+    ;x = dont touch | y = up down | z = depth // + = up/higher
+    (cond (= column 0) [0 -6.8 0]       ; original [0 2 0] // pointer finger EXTRA keys
+          (= column 1) [0 -3 0]       ; original [0 2 0] // pointer finger EXTRA keys
+          (= column 2) [0 -0.8 0]    ; original [0 2.82 -4.5] // pointer finger
+          (= column 3) [0 2.82 -2.82]    ; original [0 2.82 -4.5] // middle finger, 
+          (= column 4) [0 0 0]    ; original [0 -5.8 5.64] , [0 -12 5.64] // ring finger
+          (= column 5) [0 -6 0.8]    ; original [0 -5.8 5.64] // pinky but relegate to ring
+          (>= column 6) [0 -12 5.64]    ; original [0 -5.8 5.64] // 1.5u column, pinky
           :else [0 0 0])))
 
 (def thumb-offsets [6 -3 7])
 
-(def keyboard-z-offset 8)               ; controls overall height; original=9 with centercol=3; use 16 for centercol=2
+(def keyboard-z-offset 13)               ; controls overall height; original=9 with centercol=3; use 16 for centercol=2
 
-(def extra-width 2.5)                   ; extra space between the base of keys; original= 2
+(def extra-width 2.2)                   ; extra space between the base of keys; original= 2
 (def extra-height 1.0)                  ; original= 0.5
 
 (def wall-z-offset -8)                 ; length of the first downward-sloping part of the wall (negative)
@@ -84,7 +86,7 @@
 (def keyswitch-height 14.15)
 (def keyswitch-width 14.15)
 
-(def sa-profile-key-height 12.7)
+(def sa-profile-key-height 12.7) ;sa = 12.7, xda = 9.0
 
 (def plate-thickness 4)
 (def side-nub-thickness 4)
@@ -111,20 +113,79 @@
                                              (/ side-nub-thickness 2)])))
                       (translate [0 0 (- plate-thickness side-nub-thickness)]))
         plate-half (union top-wall left-wall (if create-side-nubs? (with-fn 100 side-nub)))
-        top-nub (->> (cube 5 5 retention-tab-hole-thickness)
+        top-nub-top (->> (cube 5 5 (- retention-tab-hole-thickness 0.5))
+                     (translate [(+ (/ keyswitch-width 2.5)) 0 (- (/ retention-tab-hole-thickness 2) 0.25)]))
+        top-nub-bottom (->> (cube 5 5 retention-tab-hole-thickness)
                      (translate [(+ (/ keyswitch-width 2.5)) 0 (- (/ retention-tab-hole-thickness 2) 0.5)]))
-        top-nub-pair (union top-nub
-                            (->> top-nub
+        top-nub-pair (union top-nub-top
+                            (->> top-nub-bottom
                                  (mirror [1 0 0])
-                                 (mirror [0 1 0])))]
-    (difference
-     (union plate-half
-            (->> plate-half
-                 (mirror [1 0 0])
-                 (mirror [0 1 0])))
-     (->>
-      top-nub-pair
-      (rotate (/ π 2) [0 0 1])))))
+                                 (mirror [0 1 0]))) ; insert the ] back here if removing hot swap
+  ;;;;;;;;;;; HOT SWAP SECTION ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+         swap-holder (->> (cube (+ keyswitch-width 3) (/ (+ keyswitch-height 3) 2) 3)
+                         (translate [0 (/ (+ keyswitch-height 3) 4) -1.5]))
+        main-axis-hole (->> (cylinder (/ 4.0 2) 10)
+                            (with-fn 12))
+        plus-hole (->> (cylinder (/ 2.9 2) 10)
+                       (with-fn 8)
+                       (translate [-3.81 2.54 0]))
+        minus-hole (->> (cylinder (/ 2.9 2) 10)
+                        (with-fn 8)
+                        (translate [2.54 5.08 0]))
+        friction-hole (->> (cylinder (/ 1.7 2) 10)
+                           (with-fn 8))
+        friction-hole-right (translate [5 0 0] friction-hole)
+        friction-hole-left (translate [-5 0 0] friction-hole)
+        hotswap-base-shape (->> (cube 14 5.80 1.8)
+                                (translate [-1 4 -2.1]))
+        hotswap-base-hold-shape (->> (cube (/ 12 2) (- 6.2 4) 1.8)
+                                     (translate [(/ 12 4) (/ (- 6.2 4) 1) -2.1]))
+        hotswap-pad (cube 4.00 3.0 2)
+        hotswap-pad-plus (translate [(- 0 (+ (/ 12.9 2) (/ 2.55 2))) 2.54 -2.1]
+                                    hotswap-pad)
+        hotswap-pad-minus (translate [(+ (/ 10.9 2) (/ 2.55 2)) 5.08 -2.1]
+                                     hotswap-pad)
+        wire-track (cube 4 (+ keyswitch-height 3) 1.8)
+        column-wire-track (->> wire-track
+                               (translate [9.5 0 -2.4]))
+        diode-wire-track (->> (cube 2 10 1.8)
+                              (translate [-7 8 -2.1]))
+        hotswap-base (union
+                      (difference hotswap-base-shape
+                                  hotswap-base-hold-shape)
+                      hotswap-pad-plus
+                      hotswap-pad-minus)
+        diode-holder (->> (cube 2 4 1.8)
+                          (translate [-7 5 -2.1]))
+        hotswap-holder (difference swap-holder
+                                   main-axis-hole
+                                   plus-hole
+                                   (mirror [-1 0 0] plus-hole)
+                                   minus-hole
+                                   (mirror [-1 0 0] minus-hole)
+                                   friction-hole-left
+                                   friction-hole-right
+                                   hotswap-base
+                                   (mirror [-1 0 0] hotswap-base))]
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    (difference (union plate-half
+                        (->> plate-half
+                            (mirror [1 0 0])
+                            (mirror [0 1 0]))
+                       hotswap-holder)
+                       (->> top-nub-pair
+                     (rotate (/ π 2) [0 0 1]))
+                #_diode-holder
+                #_diode-wire-track
+                column-wire-track)))
+
+    ;(difference (union plate-half
+    ;                   (->> plate-half
+    ;                       (mirror [1 0 0])
+    ;                       (mirror [0 1 0])))
+    ; (->>
+    ;  top-nub-pair
+    ;  (rotate (/ π 2) [0 0 1])))))
 
 ;;;;;;;;;;;;;;;;
 ;; SA Keycaps ;;
@@ -197,7 +258,7 @@
            (= col lastcol)
            (<= row last-15u-row)
            (>= row first-15u-row))
-    4.7625
+    4.7625   ;; original: 4.7625
     0))
 
 (defn apply-key-geometry [translate-fn rotate-x-fn rotate-y-fn column row shape]
@@ -1445,6 +1506,8 @@
                      inner-connectors
                      thumb-type
                      thumb-connector-type
+                     ;caps
+                     ;cfthumbcaps
                      (difference (union case-walls
                                         screw-insert-outers)
                                  usb-holder-space

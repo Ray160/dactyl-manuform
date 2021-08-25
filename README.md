@@ -1,11 +1,11 @@
 # Dactyl ManuForm Keyboard
 
-This is a fork of the [Dactyl-ManuForm](https://github.com/tshort/dactyl-keyboard). The Dactyl-Manuform is a fork of the [Dactyl](https://github.com/adereth/dactyl-keyboard) with the thumb cluster from [ManuForm](https://github.com/jeffgran/ManuForm). Some features from the Dactyl Manuform Mini are kept along with new features added. 
+This is a fork of the [Dactyl-ManuForm](https://github.com/tshort/dactyl-keyboard). The Dactyl-Manuform is a fork of the [Dactyl](https://github.com/adereth/dactyl-keyboard) with the thumb cluster from [ManuForm](https://github.com/jeffgran/ManuForm). Some features from the Dactyl Manuform Mini are kept along with new features added. Forked from [Carbonfet-Dactyl-Manuform](https://github.com/carbonfet/dactyl-manuform) and uses the hotswap sockets holders found in [Ibnuda-Dactyl-Manuform](https://github.com/ibnuda/dactyl-keyboard).
 
 ## Features
 
 - The use of sidenubs can be disabled. Sidenub should be disabled if you use Kailh, and Outemu. If you use Cherry MX, Gateron or Zealios switches, you can enable the sidenubs.
-- Toggle for outer column between using 1.5u sized keys and 1u sized keys.
+- Toggle for outer column between using 1.5u sized keys and 1u sized keys. (Default enabled)
 - If enabled, the rows which use 1.5u sized keys can be specified.
 - Toggle for an extra row of keys for the outer column(s).
 - Toggle for an extra inner column before the thumbcluster with (nrows-2) rows.
@@ -13,6 +13,10 @@ This is a fork of the [Dactyl-ManuForm](https://github.com/tshort/dactyl-keyboar
 - This new thumb cluster uses the same keycaps as the default, but is more compact. The thumb only has to move one position left or right from its neutral position to reach all the keys. 
 - Removable controller board / TRRS jack holder as a separate part. This holder is then friction fit into a cutout on the back wall of the case. Designed for common TRRS breakout boards. 
 - Models for both pro-micro and elite-c holders in the [things/](things/) directory. 
+- Adds hotswap socket holders with top and bottom clip support.
+- Added comments for how to add finger parameters into the code along with which line corresponds to which finger. (Assignments will change depending on number of columns and optional columns)
+- Default has only the modifier keys column raised for the pinky.
+- Column height and forwards/backwards positioning made to have less dramatic shifts.
 
 ## Generate OpenSCAD and STL models
 
