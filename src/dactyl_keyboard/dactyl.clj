@@ -22,36 +22,48 @@
 (def centercol 3)                       ; controls left-right tilt / tenting (higher number is more tenting)
 (def tenting-angle (/ π 12))            ; or, change this for more precise tenting control
 
-(def pinky-15u true)                   ; controls whether the outer column uses 1.5u keys
+(def pinky-15u true)                    ; controls whether the outer column uses 1.5u keys
 (def first-15u-row 0)                   ; controls which should be the first row to have 1.5u keys on the outer column
 (def last-15u-row 3)                    ; controls which should be the last row to have 1.5u keys on the outer column
 
-(def extra-row true)                   ; adds an extra bottom row to the outer columns
-(def inner-column true)                ; adds an extra inner column (two less rows than nrows)
-(def thumb-style "cf")                ; toggles between "default", "mini", and "cf" thumb cluster
+(def extra-row true)                    ; adds an extra bottom row to the outer columns
+(def inner-column true)                 ; adds an extra inner column (two less rows than nrows)
+(def thumb-style "cf")                  ; toggles between "default", "mini", and "cf" thumb cluster
+
+(def show-caps false)                   ; toggles showing keycaps in the model
 
 (def column-style :standard)
 
 (defn column-offset [column]
   (if inner-column
-    ;x = dont touch | y = up down | z = depth // + = up/higher
-    (cond (= column 0) [0 -6.8 0]       ; original [0 2 0] // pointer finger EXTRA keys
-          (= column 1) [0 -3 0]       ; original [0 2 0] // pointer finger EXTRA keys
-          (= column 2) [0 -0.8 0]    ; original [0 2.82 -4.5] // pointer finger
-          (= column 3) [0 2.82 -2.82]    ; original [0 2.82 -4.5] // middle finger, 
-          (= column 4) [0 0 0]    ; original [0 -5.8 5.64] , [0 -12 5.64] // ring finger
-          (= column 5) [0 -6 0.8]    ; original [0 -5.8 5.64] // pinky but relegate to ring
-          (>= column 6) [0 -12 5.64]    ; original [0 -5.8 5.64] // 1.5u column, pinky
+    ;; + = up/higher | - = down/lower
+    ;; x = left/right, best not to use | Y = up/down | Z = depth 
+    (cond (= column 0) [0 -6.8 0]       ; Inner column
+          (= column 1) [0 -3 0]         ; Pointer finger EXTRA keys
+          (= column 2) [0 -0.8 0]       ; Pointer finger
+          (= column 3) [0 2.82 -2.82]   ; Middle finger, 
+          (= column 4) [0 0 0]          ; Ring finger
+          (= column 5) [0 -6 0.8]       ; Pinky
+          (>= column 6) [0 -12 5.64]    ; Modifiers
+          :else [0 0 0])
+    ;; Section to modify if inner columb is disabled
+    (cond (= column 0) [0 -3 0]         ; Pointer finger EXTRA keys
+          (= column 1) [0 -0.8 0]       ; Pointer finger
+          (= column 2) [0 2.82 -2.82]   ; Middle finger, 
+          (= column 3) [0 0 0]          ; Ring finger
+          (= column 4) [0 -6 0.8]       ; Pinky
+          (>= column 5) [0 -12 5.64]    ; Modifiers
           :else [0 0 0])))
 
-(def thumb-offsets [6 -3 7])
 
-(def keyboard-z-offset 13)               ; controls overall height; original=9 with centercol=3; use 16 for centercol=2
+(def thumb-offsets [6 -3 7])            ; Changes to thumb cluster placement go here
+
+(def keyboard-z-offset 13)              ; controls overall height; original=9 with centercol=3; use 16 for centercol=2
 
 (def extra-width 2.2)                   ; extra space between the base of keys; original= 2
 (def extra-height 1.0)                  ; original= 0.5
 
-(def wall-z-offset -8)                 ; length of the first downward-sloping part of the wall (negative)
+(def wall-z-offset -8)                  ; length of the first downward-sloping part of the wall (negative)
 (def wall-xy-offset 5)                  ; offset in the x and/or y direction for the first downward-sloping part of the wall (negative)
 (def wall-thickness 2)                  ; wall thickness parameter; originally 5
 
@@ -1506,7 +1518,13 @@
                      inner-connectors
                      thumb-type
                      thumb-connector-type
-                     ;caps
+                     (if show-caps caps)
+                     ;(if show-caps 
+                     ;   (do
+                          (if (and (= thumb-style "cf") show-caps) cfthumbcaps)
+                          (if (and (= thumb-style "mini") show-caps) minithumbcaps)
+                          (if (and (= thumb-style "default") show-caps) thumbcaps)
+                    ; ))
                      ;cfthumbcaps
                      (difference (union case-walls
                                         screw-insert-outers)
